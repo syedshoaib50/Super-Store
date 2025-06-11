@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Super Store</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+  :root {
+    --color-bg: #101419;
+    --color-primary: #1ca7ec;
+    --color-primary-dark: #1878b3;
+    --color-text-primary: #f0f4f8;
+    --color-text-secondary: #a0aabb;
+    --color-card-bg: #19232e;
+    --color-shadow-light: rgba(38, 156, 234, 0.35);
+    --color-shadow-dark: rgba(0, 0, 0, 0.7);
+    --border-radius: 0.75rem;
+    --transition-speed: 0.3s;
+  }
+
+  /* 3D layered background with gradient + blur + shadows for depth */
+  body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background:
+      radial-gradient(circle at 40% 20%, rgba(56, 189, 248, 0.35), transparent 60%),
+      radial-gradient(circle at 70% 80%, rgba(14, 165, 233, 0.5), transparent 55%),
+      linear-gradient(135deg, #0c121d, #141d29 90%);
+    color: var(--color-text-primary);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Container max-width and centered */
+  .container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem 4rem;
+    flex-grow: 1;
+  }
+
+  /* Header Sticky Navigation */
+  header {
+    background-color: rgba(10, 17, 28, 0.85);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 8px var(--color-shadow-dark);
+    backdrop-filter: saturate(150%) blur(12px);
+  }
+  nav {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1rem;
+  }
+  .logo {
+    font-weight: 700;
+    font-size: 1.8rem;
+    color: var(--color-primary);
+    cursor: pointer;
+    user-select: none;
+    letter-spacing: 0.06em;
+    text-shadow: 0 0 8px var(--color-primary);
+  }
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+  }
+  .nav-links button {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-text-secondary);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--border-radius);
+    transition: all var(--transition-speed) ease;
+    position: relative;
+  }
+  .nav-links button:hover,
+  .nav-links button.active {
+    color: var(--color-primary);
+    box-shadow: 0 0 8px var(--color-primary);
+    background-color: rgba(28, 167, 236, 0.1);
+    transform: scale(1.05);
+  }
+
+  /* Page container sections to switch */
+  .page {
+    display: none;
+    animation: fadeIn 0.6s ease forwards;
+  }
+  .page.active {
+    display: block;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px);}
+    to { opacity: 1; transform: translateY(0);}
+  }
+
+  /* Sections general styling */
+  section {
+    margin-bottom: 3rem;
+    padding: 2rem;
+    background-color: var(--color-card-bg);
+    border-radius: var(--border-radius);
+    box-shadow:
+      0 0 12px var(--color-shadow-dark),
+      inset 0 0 12px rgba(0, 0, 0, 0.5);
+  }
+  h1, h2, h3 {
+    margin: 0 0 1rem 0;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+  h1 {
+    font-size: 2.5rem;
+  }
+  h2 {
+    font-size: 2rem;
+  }
+  h3 {
+    font-size: 1.25rem;
+  }
+  p {
+    margin: 0 0 1.5rem 0;
+    color: var(--color-text-secondary);
+  }
+
+  /* Hero section */
+  .hero {
+    text-align: center;
+    padding: 4rem 2rem;
+  }
+  .hero h1 {
+    font-size: 3.5rem;
+    color: var(--color-primary);
+    text-shadow: 0 0 12px var(--color-primary);
+  }
+  .hero p {
+    font-size: 1.2rem;
+    max-width: 640px;
+    margin: 1rem auto 2rem auto;
+    color: var(--color-text-primary);
+  }
+  .btn {
+    display: inline-block;
+    padding: 1rem 2.5rem;
+    background: var(--color-primary);
+    border: none;
+    border-radius: var(--border-radius);
+    color: white;
+    font-size: 1.15rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 0 18px var(--color-primary);
+    transition: all var(--transition-speed) ease;
+    user-select: none;
+  }
+  .btn:hover {
+    background: var(--color-primary-dark);
+    transform: scale(1.05);
+    box-shadow: 0 0 25px var(--color-primary-dark);
+  }
+
+  /* Products grid styling */
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px,1fr));
+    gap: 1.25rem;
+  }
+  .product-card {
+    background: linear-gradient(135deg, #1a2a43, #122437);
+    border-radius: var(--border-radius);
+    box-shadow: 0 8px 20px rgba(28, 167, 236, 0.25);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+  }
+  .product-card:hover {
+    transform: translateY(-6px) scale(1.03);
+    box-shadow: 0 15px 30px rgba(28, 167, 236, 0.6);
+  }
+  .product-image {
+    background-color: #223046;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    width: 100%;
+  }
+  .product-info {
+    padding: 0.75rem 1rem;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  .product-name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--color-text-primary);
+    margin: 0 0 0.3rem 0;
+    line-height: 1.2;
+    flex-grow: 1;
+  }
+  .product-price {
+    font-weight: 700;
+    color: var(--color-primary);
+    font-size: 1.1rem;
+  }
+
+  /* Pagination controls */
+  .pagination {
+    display: flex;
+    justify-content: center;
+    margin: 2rem 0 1rem 0;
+    gap: 1rem;
+  }
+  .pagination button {
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    border: none;
+    cursor: pointer;
+    background-color: var(--color-card-bg);
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    transition: all var(--transition-speed) ease;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+  }
+  .pagination button:hover {
+    color: var(--color-primary);
+    box-shadow:
+      0 0 10px var(--color-primary),
+      inset 0 0 5px rgba(0,0,0,0.7);
+  }
+  .pagination button:disabled {
+    cursor: default;
+    opacity: 0.4;
+  }
+
+  /* Footer */
+  footer {
+    background-color: #0a101c;
+    color: var(--color-text-secondary);
+    text-align: center;
+    padding: 1rem 1rem 2rem 1rem;
+    font-size: 0.9rem;
+    user-select: none;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .hero h1 {
+      font-size: 2.4rem;
+    }
+    .container {
+      padding: 1rem 1rem 3rem;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <nav>
+    <div class="logo" role="banner" tabindex="0" aria-label="Draz Shopping Store Logo">Super Store</div>
+    <div class="nav-links" role="navigation" aria-label="Main navigation">
+      <button data-page="home" class="active" aria-current="page">Home</button>
+      <button data-page="products">Products</button>
+      <button data-page="about">About</button>
+      <button data-page="services">Services</button>
+      <button data-page="contact">Contact</button>
+    </div>
+  </nav>
+</header>
+<main class="container" id="main-content">
+  <!-- Home Page -->
+  <section class="page active" id="home" aria-label="Home page">
+    <section class="hero" aria-label="Hero section">
+      <h1>Discover Your Favorite Products at Super Store</h1>
+      <p>The ultimate shopping experience with thousands of choices all in one place.</p>
+      <button class="btn" data-page="products" aria-label="Browse products">Browse Products</button>
+    </section>
+
+    <section aria-label="New Arrivals" id="new-arrivals">
+      <h2>New Arrivals</h2>
+      <p>Fresh products just landed. Explore the latest trends and must-haves.</p>
+      <div class="products-grid" id="new-arrivals-list"></div>
+    </section>
+
+    <section aria-label="Featured Categories" id="featured-categories">
+      <h2>Featured Categories</h2>
+      <p>Explore curated categories to find what you need easily.</p>
+      <div class="products-grid" id="featured-categories-list"></div>
+    </section>
+
+    <section aria-label="Customer Favorites" id="customer-favorites">
+      <h2>Customer Favorites</h2>
+      <p>Products loved by our community.</p>
+      <div class="products-grid" id="customer-favorites-list"></div>
+    </section>
+
+    <section aria-label="Why Shop at Draz" id="why-shop">
+      <h2>Why Shop at Super Store?</h2>
+      <p>Unmatched quality, unbeatable prices, and exceptional customer service.</p>
+      <div style="display:flex; gap:2rem; flex-wrap:wrap; justify-content:center;">
+        <div style="background:#223046; padding:1.5rem; border-radius:0.75rem; max-width:280px; box-shadow:0 0 12px var(--color-primary); text-align:center;">
+          <h3>Wide Selection</h3>
+          <p>300+ products and growing every day.</p>
+        </div>
+        <div style="background:#223046; padding:1.5rem; border-radius:0.75rem; max-width:280px; box-shadow:0 0 12px var(--color-primary); text-align:center;">
+          <h3>Secure Payments</h3>
+          <p>Top level encryption to keep your details safe.</p>
+        </div>
+        <div style="background:#223046; padding:1.5rem; border-radius:0.75rem; max-width:280px; box-shadow:0 0 12px var(--color-primary); text-align:center;">
+          <h3>Fast Delivery</h3>
+          <p>Reliable shipping worldwide with tracking.</p>
+        </div>
+      </div>
+    </section>
+  </section>
+
+  <!-- Products Page with product grid and pagination -->
+  <section class="page" id="products" aria-label="Products page">
+    <h1>All Products</h1>
+    <div class="products-grid" id="products-list" aria-live="polite" aria-relevant="additions"></div>
+    <div class="pagination" role="navigation" aria-label="Products pagination">
+      <button id="prev-page" aria-label="Previous page">&lt; Prev</button>
+      <button id="next-page" aria-label="Next page">Next &gt;</button>
+    </div>
+  </section>
+
+  <!-- About Page -->
+  <section class="page" id="about" aria-label="About page">
+    <h1>About Super Store</h1>
+    <section>
+      <h2>Our Story</h2>
+      <p>Super Store started with a simple mission: provide the best products with outstanding service and an unbeatable shopping experience.</p>
+    </section>
+    <section>
+      <h2>Our Team</h2>
+      <p>Passionate professionals dedicated to customer satisfaction and innovation.</p>
+    </section>
+    <section>
+      <h2>Our Values</h2>
+      <p>Quality, trust, and community - the pillars of our business.</p>
+    </section>
+    <section>
+      <h2>Community Impact</h2>
+      <p>Supporting causes and initiatives that give back and make a difference.</p>
+    </section>
+  </section>
+
+  <!-- Services Page -->
+  <section class="page" id="services" aria-label="Services page">
+    <h1>Our Services</h1>
+    <section>
+      <h2>Customization</h2>
+      <p>Personalize your purchases with custom options and add-ons.</p>
+    </section>
+    <section>
+      <h2>Gift Wrapping</h2>
+      <p>Add gift wrapping and personalized messages.</p>
+    </section>
+    <section>
+      <h2>Fast Shipping</h2>
+      <p>Choose expedited shipping options for quicker delivery.</p>
+    </section>
+    <section>
+      <h2>Customer Support</h2>
+      <p>24/7 support to help you with every question and concern.</p>
+    </section>
+  </section>
+
+  <!-- Contact Page -->
+  <section class="page" id="contact" aria-label="Contact page">
+    <h1>Contact Us</h1>
+    <section>
+      <h2>Get in Touch</h2>
+      <p>We'd love to hear from you. Reach out any time!</p>
+      <form id="contact-form" aria-label="Contact form" novalidate>
+        <div style="margin-bottom:1rem;">
+          <label for="name">Name</label><br />
+          <input type="text" id="name" name="name" required aria-required="true" style="width:100%;padding:0.5rem;border-radius:0.5rem;border:none;"/>
+        </div>
+        <div style="margin-bottom:1rem;">
+          <label for="email">Email</label><br />
+          <input type="email" id="email" name="email" required aria-required="true" style="width:100%;padding:0.5rem;border-radius:0.5rem;border:none;" />
+        </div>
+        <div style="margin-bottom:1rem;">
+          <label for="message">Message</label><br />
+          <textarea id="message" name="message" rows="4" required aria-required="true" style="width:100%;padding:0.5rem;border-radius:0.5rem;border:none;"></textarea>
+        </div>
+        <button type="submit" class="btn">Send Message</button>
+        <p id="form-status" role="alert" aria-live="polite" style="margin-top:1rem;"></p>
+      </form>
+    </section>
+  </section>
+</main>
+<footer>
+  &copy; 2025 Super Store. All rights reserved.
+</footer>
+<script>
+  const navButtons = document.querySelectorAll('.nav-links button');
+  const pages = document.querySelectorAll('.page');
+  navButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.getAttribute('data-page');
+      pages.forEach(p => p.classList.toggle('active', p.id === target));
+      navButtons.forEach(b => b.classList.toggle('active', b === btn));
+      document.getElementById(target).focus();
+    });
+  });
+
+  const totalProducts = 300;
+  const productsPerPage = 28;
+  let currentPage = 1;
+  const productList = [];
+
+  function generateProducts() {
+    for (let i = 1; i <= totalProducts; i++) {
+      productList.push({
+        id: i,
+        name: `Product ${i}`,
+        price: (Math.random() * 100 + 10).toFixed(2),
+        image: `https://picsum.photos/seed/product${i}/300/300`
+      });
+    }
+  }
+
+  function renderProducts(container, products) {
+    container.innerHTML = '';
+    products.forEach(prod => {
+      const card = document.createElement('article');
+      card.className = 'product-card';
+      card.setAttribute('tabindex', 0);
+      card.innerHTML = `
+        <img src="${prod.image}" alt="${prod.name}" class="product-image" loading="lazy" />
+        <div class="product-info">
+          <h3 class="product-name">${prod.name}</h3>
+          <div class="product-price">$${prod.price}</div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  const prevBtn = document.getElementById('prev-page');
+  const nextBtn = document.getElementById('next-page');
+  const productsContainer = document.getElementById('products-list');
+
+  function updatePaginationButtons() {
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = currentPage === Math.ceil(totalProducts / productsPerPage);
+  }
+
+  function getProductsPage(page) {
+    const start = (page - 1) * productsPerPage;
+    return productList.slice(start, start + productsPerPage);
+  }
+
+  function goToPage(page) {
+    currentPage = page;
+    renderProducts(productsContainer, getProductsPage(page));
+    updatePaginationButtons();
+  }
+
+  prevBtn.addEventListener('click', () => {
+    if (currentPage > 1) {
+      goToPage(currentPage - 1);
+    }
+  });
+  nextBtn.addEventListener('click', () => {
+    if (currentPage < Math.ceil(totalProducts / productsPerPage)) {
+      goToPage(currentPage + 1);
+    }
+  });
+
+  generateProducts();
+  goToPage(1);
+
+  function sliceAndRender(containerId, startIndex) {
+    renderProducts(document.getElementById(containerId), productList.slice(startIndex, startIndex + 6));
+  }
+  sliceAndRender('new-arrivals-list', 0);
+  sliceAndRender('featured-categories-list', 50);
+  sliceAndRender('customer-favorites-list', 100);
+
+  const form = document.getElementById('contact-form');
+  const statusText = document.getElementById('form-status');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    statusText.textContent = "Sending...";
+    setTimeout(() => {
+      statusText.textContent = "Thanks for reaching out! We'll get back to you soon.";
+      form.reset();
+    }, 1500);
+  });
+
+</script>
+</body>
+</html>
+
